@@ -1,8 +1,14 @@
-from flask import Flask, render_template, request
-from sqlalchemy import Boolean
+from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import Integer, String, Boolean
+
+class Base(DeclarativeBase):
+    pass
 
 app = Flask(__name__)
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
+db = SQLAlchemy(model_class=Base)
 
 class Task(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -17,7 +23,8 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    db.session.execute(db.select(Task).order_by(Task.id)).scalars().all()
+    return render_template('home.html', tasks=all_tasks)
 
 if __name__ == '__main__':
     app.run(debug=True)
