@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
@@ -23,8 +23,19 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    db.session.execute(db.select(Task).order_by(Task.id)).scalars().all()
-    return render_template('home.html', tasks=all_tasks)
+    all_tasks = db.session.execute(db.select(Task).order_by(Task.id)).scalars().all()
+    return render_template('index.html', tasks=all_tasks)
+
+@app.route('/add', methods=['POST'])
+def add_task():
+    task_title = request.form.get("title", "").strip()
+
+    if task_title:
+        new_task = Task(title=task_title)
+        db.session.add(new_task)
+        db.session.commit()
+
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)
