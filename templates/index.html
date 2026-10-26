@@ -8,6 +8,17 @@
 <body>
     <h1>My Todo List</h1>
 
+    <form action="{{ url_for('add_task') }}" method="POST">
+        <input
+            type="text"
+            name="title"
+            placeholder="Enter a new task..."
+            maxlength="200"
+            required
+        >
+        <button type="submit">Add Task</button>
+    </form>
+
     <ul>
         {% for task in tasks %}
             <li>
@@ -19,7 +30,7 @@
                 {% endif %}
             </li>
         {% else %}
-            <li>No tasks yet. Add your first task soon!</li>
+            <li>No tasks yet. Add your first task!</li>
         {% endfor %}
     </ul>
 </body>
