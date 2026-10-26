@@ -22,12 +22,27 @@
     <ul>
         {% for task in tasks %}
             <li>
-                {{ task.title }}
+
+
                 {% if task.completed %}
+                    <s>{{ task.title }}</s>
                     - Completed
                 {% else %}
+                    {{ task.title }}
                     - Pending
                 {% endif %}
+
+                <form action="{{ url_for('complete_task', task_id=task.id) }}"
+                        method="POST"
+                        style="display: inline;">
+                    <button type="submit">
+                        {% if task.completed %}
+                            Undo
+                        {% else %}
+                            Done
+                        {% endif %}
+                    </button>
+                </form>
             </li>
         {% else %}
             <li>No tasks yet. Add your first task!</li>
