@@ -37,5 +37,12 @@ def add_task():
 
     return redirect(url_for('home'))
 
+@app.route('/complete/<int:task_id>', methods=['POST'])
+def complete_task(task_id):
+    task = db.get_or_404(Task, task_id)
+    task.completed = not task.completed
+    db.session.commit()
+    return redirect(url_for('home'))
+
 if __name__ == '__main__':
     app.run(debug=True)
