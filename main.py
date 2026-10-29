@@ -44,7 +44,7 @@ def complete_task(task_id):
     db.session.commit()
     return redirect(url_for('home'))
 
-@app.route('/delete/<int:task_id>')
+@app.route('/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
     task = db.get_or_404(Task, task_id)
 
