@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
@@ -52,6 +52,24 @@ def delete_task(task_id):
     db.session.commit()
 
     return redirect(url_for('home'))
+
+@app.route('/edit/<int:task_id>', methods=['GET', 'POST'])
+def edit_task(task_id):
+    task = db.get_or_404(Task, task_id)
+
+    if request.method == 'POST':
+
+        task_title = request.form.get("title", "").strip()
+
+        if task.title:
+            task.title = task_title
+            db.session.commit()
+            return redirect(url_for('home'))
+        flash("Title can not be blank")
+
+    return render_template('edit.html', task=task)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
