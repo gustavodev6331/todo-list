@@ -23,8 +23,34 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    all_tasks = db.session.execute(db.select(Task).order_by(Task.id)).scalars().all()
-    return render_template('index.html', tasks=all_tasks)
+        filter_status = request.args.get("filter", "all")
+
+        query = db.select(Task)
+
+        if filter_status == "pending":
+            query = query.where(Task.completed == False)
+        elif filter_status == "completed":
+            query = query.where(Task.completed == True)
+        else:
+            filter_status = "all"
+
+        all_tasks = db.session.execute(
+            query.order_by(Task.id)
+        ).scalars().all()
+
+        pending_count = db.session.execute(
+            db.select(db.func.count())
+            .select_from(Task)
+            .where(Task.completed == False)
+        ).scalar()
+
+        return render_template(
+            "index.html",
+            tasks=all_tasks,
+            current_filter=filter_status,
+            pending_count=pending_count
+        )
+
 
 @app.route('/add', methods=['POST'])
 def add_task():
