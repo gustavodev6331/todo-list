@@ -38,17 +38,23 @@ def home():
             query.order_by(Task.id)
         ).scalars().all()
 
-        pending_count = db.session.execute(
-            db.select(db.func.count())
-            .select_from(Task)
-            .where(Task.completed == False)
+        total_count = db.session.execute(
+            db.select(db.func.count()).select_from(Task)
         ).scalar()
+
+        completed_count = db.session.execute(
+            db.select(db.func.count()).select_from(Task)
+                           .where(Task.completed == True)).scalar()
+
+        pending_count = total_count - completed_count
 
         return render_template(
             "index.html",
             tasks=all_tasks,
             current_filter=filter_status,
-            pending_count=pending_count
+            pending_count=pending_count,
+            completed_count=completed_count,
+            total_count=total_count,
         )
 
 
@@ -87,7 +93,7 @@ def edit_task(task_id):
 
         task_title = request.form.get("title", "").strip()
 
-        if task.title:
+        if task_title:
             task.title = task_title
             db.session.commit()
             return redirect(url_for('home'))
